@@ -1,32 +1,50 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Context/AuthProvider';
 
-const Login = () => {
+const Register = () => {
     const { register, formState: { errors }, handleSubmit } = useForm();
-    const { logIn } = useContext(AuthContext)
-    const handleSignup = data => {
+    const { createUser,updateUserProfile } = useContext(AuthContext)
+    const handleRegister = data => {
         // console.log(data)
-        logIn(data.email, data.password)
-            .then((result) => {
+        createUser(data.email, data.password)
+            .then(result => {
 
                 const user = result.user;
-                alert("log in Successfull")
+                alert("Create Successfull")
+                const profile = {
+                    displayName : data.name,
+                    
+                  }
+                  updateUserProfile(profile)
+                  .then(() =>{ })
+                  .catch(error =>console.error(error));
 
             })
             .catch((error) => {
-                alert("error")
-            });
+                console.error(error)
+                
+              });
     }
-
     return (
         <div className='h-[800px]  flex justify-center items-center' >
-            <div className='w-96 h-[480px] rounded-lg shadow-lg p-10'>
-                <h1 className='text-center text-3xl font-bold'>Login</h1>
-                <form onSubmit={handleSubmit(handleSignup)}>
+            <div className='w-96 h-[570px] rounded-lg shadow-lg p-10'>
+                <h1 className='text-center text-3xl font-bold'>Register</h1>
+                <form onSubmit={handleSubmit(handleRegister)}>
 
 
+                    <div className="form-control w-full max-w-xs">
+                        <label className="label">
+                            <span className="label-text">Name</span>
+
+                        </label>
+
+                        <input type="text" {...register("name",
+
+                            { required: "Name is required" })} className="input input-bordered w-full max-w-xs" />
+                        {errors.name && <p className='text-red-600'>{errors.name?.message}</p>}
+                    </div>
                     <div className="form-control w-full max-w-xs">
                         <label className="label">
                             <span className="label-text">Email</span>
@@ -59,11 +77,11 @@ const Login = () => {
                     </div>
 
                     {/* <p>{data}</p> */}
-                    <input className='btn w-full' type="submit" />
+                    <input className='btn w-full' type="submit" value='Register' />
                 </form>
                 <label className="label">
-                    <span className="label-text-alt">Don't have account?</span>
-                    <Link to='/register' className='text-primary'>Create Account</Link>
+                    <span className="label-text-alt">Already have an account?</span>
+                    <Link to='/login' className='text-primary'>Login</Link>
                 </label>
                 <div className="divider">OR</div>
 
@@ -73,4 +91,4 @@ const Login = () => {
     );
 };
 
-export default Login;
+export default Register;
