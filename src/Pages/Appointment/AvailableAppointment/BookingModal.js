@@ -1,7 +1,9 @@
 import { format } from 'date-fns';
-import React from 'react';
+import React, { useContext } from 'react';
+import { AuthContext } from '../../../Context/AuthProvider';
 
-const BookingModal = ({ treatment, selectedDate,setTreatment }) => {
+const BookingModal = ({ treatment, selectedDate,setTreatment,refetch }) => {
+    const {user} = useContext(AuthContext)
 
     const { name, slots } = treatment
     const selectedate = format(selectedDate, 'PP')
@@ -9,21 +11,46 @@ const BookingModal = ({ treatment, selectedDate,setTreatment }) => {
     const handleSubmit = event =>{
         event.preventDefault()
         const form = event.target;
-        const date= selectedDate;
+        
         const patient = form.name.value;
         const email = form.email.value;
         const phone = form.phone.value;
+        const slot = form.slot.value;
         // console.log(date,name,email,phone)
         const booking ={
             patient,
             treatment:name,
             email,
             phone,
-            appointmentDate : date
+            slot,
+            appointmentDate : selectedate
 
         }
-        console.log(booking)
-        setTreatment(null)
+
+        fetch('http://localhost:5000/bookings',{
+            method: 'POST',
+            headers:{
+                'content-type' : 'application/json'
+            },
+            body : JSON.stringify(booking)
+
+        })
+        .then(res =>res.json())
+        .then(data =>{
+            console.log(data)
+            if(data.acknowledged){
+                setTreatment(null)
+                alert('booking successfull')
+                refetch();
+            }
+            else {
+                alert(`${data.message}`)
+            }
+            
+        })
+
+        
+        
     }
 
     return (
@@ -46,8 +73,8 @@ const BookingModal = ({ treatment, selectedDate,setTreatment }) => {
                             }
                         </select>
 
-                        <input name='name' type="text" placeholder="name" className="input input-bordered w-full " />
-                        <input name='email' type="email" placeholder="email" className="input input-bordered w-full " />
+                        <input name='name' type="text" defaultValue={user?.displayName} disabled placeholder="name" className="input input-bordered w-full " />
+                        <input name='email' type="email" defaultValue={user?.email} disabled placeholder="email" className="input input-bordered w-full " />
                         <input name='phone' type="text" placeholder="phone" className="input input-bordered w-full " />
                         <input type="submit" value='submit' className="btn btn-primary w-full text-white  " />
                     </form>

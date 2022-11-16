@@ -1,9 +1,12 @@
 import React, { useContext } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Context/AuthProvider';
 
 const Register = () => {
+     
+    const navigate = useNavigate();
+
     const { register, formState: { errors }, handleSubmit } = useForm();
     const { createUser,updateUserProfile } = useContext(AuthContext)
     const handleRegister = data => {
@@ -18,7 +21,9 @@ const Register = () => {
                     
                   }
                   updateUserProfile(profile)
-                  .then(() =>{ })
+                  .then(() =>{ 
+                    navigate('/login')
+                  })
                   .catch(error =>console.error(error));
 
             })
